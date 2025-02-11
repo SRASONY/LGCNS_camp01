@@ -5,6 +5,7 @@ import com.example.board.entity.BoardEntity;
 import com.example.board.entity.BoardFileEntity;
 import com.example.board.repository.JpaBoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -40,7 +41,11 @@ public class JpaBoardServiceImpl implements JpaBoardService {
     }
     @Override
     public void insertBoard(BoardEntity boardEntity, MultipartHttpServletRequest request) throws Exception {
-        boardEntity.setCreatedId("admin");
+        // boardEntity.setCreatedId("admin");
+        // 로그인한 사용자의 아이디를 글쓴이 아이디로 설정
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        boardEntity.setCreatedId(username);
+
         List<BoardFileEntity> list = fileUtils.parseFileInfo2(boardEntity.getBoardIdx(), request);
         if (!CollectionUtils.isEmpty(list)) {
             boardEntity.setFileInfoList(list);
